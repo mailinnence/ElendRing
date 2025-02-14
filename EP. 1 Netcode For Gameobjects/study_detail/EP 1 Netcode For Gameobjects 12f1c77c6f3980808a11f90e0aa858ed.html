@@ -1,0 +1,932 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>EP. 1 Netcode For Gameobjects</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+    margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: rgba(35, 131, 226, .07); }
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-transparentGray { background-color: rgba(227, 226, 224, 0); }
+.select-value-color-translucentGray { background-color: rgba(0, 0, 0, 0.06); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="12f1c77c-6f39-8080-8a11-f90e0aa858ed" class="page sans"><header><h1 class="page-title"><strong>EP. 1 Netcode For Gameobjects</strong></h1><p class="page-description"></p><table class="properties"><tbody><tr class="property-row property-row-multi_select"><th><span class="icon property-icon"><svg role="graphics-symbol" viewBox="0 0 16 16" style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0" class="typesMultipleSelect"><path d="M1.91602 4.83789C2.44238 4.83789 2.87305 4.40723 2.87305 3.87402C2.87305 3.34766 2.44238 2.91699 1.91602 2.91699C1.38281 2.91699 0.952148 3.34766 0.952148 3.87402C0.952148 4.40723 1.38281 4.83789 1.91602 4.83789ZM5.1084 4.52344H14.3984C14.7607 4.52344 15.0479 4.23633 15.0479 3.87402C15.0479 3.51172 14.7607 3.22461 14.3984 3.22461H5.1084C4.74609 3.22461 4.45898 3.51172 4.45898 3.87402C4.45898 4.23633 4.74609 4.52344 5.1084 4.52344ZM1.91602 9.03516C2.44238 9.03516 2.87305 8.60449 2.87305 8.07129C2.87305 7.54492 2.44238 7.11426 1.91602 7.11426C1.38281 7.11426 0.952148 7.54492 0.952148 8.07129C0.952148 8.60449 1.38281 9.03516 1.91602 9.03516ZM5.1084 8.7207H14.3984C14.7607 8.7207 15.0479 8.43359 15.0479 8.07129C15.0479 7.70898 14.7607 7.42188 14.3984 7.42188H5.1084C4.74609 7.42188 4.45898 7.70898 4.45898 8.07129C4.45898 8.43359 4.74609 8.7207 5.1084 8.7207ZM1.91602 13.2324C2.44238 13.2324 2.87305 12.8018 2.87305 12.2686C2.87305 11.7422 2.44238 11.3115 1.91602 11.3115C1.38281 11.3115 0.952148 11.7422 0.952148 12.2686C0.952148 12.8018 1.38281 13.2324 1.91602 13.2324ZM5.1084 12.918H14.3984C14.7607 12.918 15.0479 12.6309 15.0479 12.2686C15.0479 11.9062 14.7607 11.6191 14.3984 11.6191H5.1084C4.74609 11.6191 4.45898 11.9062 4.45898 12.2686C4.45898 12.6309 4.74609 12.918 5.1084 12.918Z"></path></svg></span>태그</th><td><span class="selected-value select-value-color-yellow">강의</span></td></tr><tr class="property-row property-row-text"><th><span class="icon property-icon"><svg role="graphics-symbol" viewBox="0 0 16 16" style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0" class="typesText"><path d="M1.56738 3.25879H14.4258C14.7676 3.25879 15.0479 2.97852 15.0479 2.63672C15.0479 2.29492 14.7744 2.02148 14.4258 2.02148H1.56738C1.21875 2.02148 0.952148 2.29492 0.952148 2.63672C0.952148 2.97852 1.22559 3.25879 1.56738 3.25879ZM1.56738 6.84082H14.4258C14.7676 6.84082 15.0479 6.56055 15.0479 6.21875C15.0479 5.87695 14.7744 5.60352 14.4258 5.60352H1.56738C1.21875 5.60352 0.952148 5.87695 0.952148 6.21875C0.952148 6.56055 1.22559 6.84082 1.56738 6.84082ZM1.56738 10.4229H14.4258C14.7676 10.4229 15.0479 10.1426 15.0479 9.80078C15.0479 9.45898 14.7744 9.18555 14.4258 9.18555H1.56738C1.21875 9.18555 0.952148 9.45898 0.952148 9.80078C0.952148 10.1426 1.22559 10.4229 1.56738 10.4229ZM1.56738 14.0049H8.75879C9.10059 14.0049 9.38086 13.7246 9.38086 13.3828C9.38086 13.041 9.10742 12.7676 8.75879 12.7676H1.56738C1.21875 12.7676 0.952148 13.041 0.952148 13.3828C0.952148 13.7246 1.22559 14.0049 1.56738 14.0049Z"></path></svg></span>github</th><td><a href="https://github.com/mailinnence/ElendRing/tree/main/EP.%201%20Netcode%20For%20Gameobjects">https://github.com/mailinnence/ElendRing/tree/main/EP. 1 Netcode For Gameobjects</a></td></tr><tr class="property-row property-row-text"><th><span class="icon property-icon"><svg role="graphics-symbol" viewBox="0 0 16 16" style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0" class="typesText"><path d="M1.56738 3.25879H14.4258C14.7676 3.25879 15.0479 2.97852 15.0479 2.63672C15.0479 2.29492 14.7744 2.02148 14.4258 2.02148H1.56738C1.21875 2.02148 0.952148 2.29492 0.952148 2.63672C0.952148 2.97852 1.22559 3.25879 1.56738 3.25879ZM1.56738 6.84082H14.4258C14.7676 6.84082 15.0479 6.56055 15.0479 6.21875C15.0479 5.87695 14.7744 5.60352 14.4258 5.60352H1.56738C1.21875 5.60352 0.952148 5.87695 0.952148 6.21875C0.952148 6.56055 1.22559 6.84082 1.56738 6.84082ZM1.56738 10.4229H14.4258C14.7676 10.4229 15.0479 10.1426 15.0479 9.80078C15.0479 9.45898 14.7744 9.18555 14.4258 9.18555H1.56738C1.21875 9.18555 0.952148 9.45898 0.952148 9.80078C0.952148 10.1426 1.22559 10.4229 1.56738 10.4229ZM1.56738 14.0049H8.75879C9.10059 14.0049 9.38086 13.7246 9.38086 13.3828C9.38086 13.041 9.10742 12.7676 8.75879 12.7676H1.56738C1.21875 12.7676 0.952148 13.041 0.952148 13.3828C0.952148 13.7246 1.22559 14.0049 1.56738 14.0049Z"></path></svg></span>강의</th><td><a href="https://www.youtube.com/watch?v=1RzKXVcqdtQ&amp;list=PLD_vBJjpCwJvP9F9CeDRiLs08a3ldTpW5&amp;index=2">https://www.youtube.com/watch?v=1RzKXVcqdtQ&amp;list=PLD_vBJjpCwJvP9F9CeDRiLs08a3ldTpW5&amp;index=2</a></td></tr></tbody></table></header><div class="page-body"><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">Netcode for GameObjects</summary><div class="indented"><p id="1301c77c-6f39-807f-a612-c1711d6951f7" class="">Unity의 <strong>Netcode for GameObjects</strong>는 멀티플레이어 게임 개발을 위한 네트워킹 프레임워크입니다. 이 패키지는 클라이언트와 서버 간의 통신을 쉽게 설정하고 관리할 수 있게 해주며, 동기화, 상태 업데이트, RPC(Remote Procedure Call) 기능 등을 지원합니다. 주로 다음과 같은 기능을 제공합니다:</p><ol type="1" id="1301c77c-6f39-8029-96c9-ec46ba175bd5" class="numbered-list" start="1"><li><strong>객체 동기화</strong>: 게임 객체의 위치, 회전, 애니메이션 상태 등을 네트워크를 통해 클라이언트와 서버 간에 자동으로 동기화할 수 있습니다. 이를 통해 모든 플레이어의 게임 화면에 일관된 상태를 유지합니다.</li></ol><ol type="1" id="1301c77c-6f39-80e7-801b-cb5255b1b0a6" class="numbered-list" start="2"><li><strong>네트워크 객체</strong>: 네트워크를 통해 생성 및 삭제할 수 있는 객체로, 플레이어나 몬스터 같은 캐릭터 또는 주요 상호작용 요소를 네트워크 상에서 쉽게 관리할 수 있게 합니다.</li></ol><ol type="1" id="1301c77c-6f39-80af-b7da-ef3374aef2da" class="numbered-list" start="3"><li><strong>RPC(Remote Procedure Calls)</strong>: 원격에서 메서드를 호출할 수 있는 기능을 제공하여, 특정 이벤트나 상호작용을 모든 클라이언트에 전달할 때 유용합니다.</li></ol><ol type="1" id="1301c77c-6f39-80c4-b155-f4a339d59819" class="numbered-list" start="4"><li><strong>자동 연결 및 전송 관리</strong>: 클라이언트와 서버 간의 데이터 전송을 효율적으로 관리해 주며, 다양한 연결 방법(UDP, TCP 등)을 지원합니다.</li></ol><ol type="1" id="1301c77c-6f39-801c-bb02-d2b85bd375eb" class="numbered-list" start="5"><li><strong>성능 최적화 도구</strong>: 패킷 전송 및 대역폭 사용을 최적화하기 위한 다양한 기능이 내장되어 있습니다.</li></ol><p id="1301c77c-6f39-8094-bd78-c252cdbfc192" class="">Unity에서 멀티플레이어 게임을 빠르게 구축하고 동기화 이슈를 해결하는 데 유용하며, MLAPI(Multiplayer Networking Library for Unity)에서 발전한 Unity의 공식 멀티플레이어 솔루션입니다.</p><p id="1301c77c-6f39-803c-b1a5-df72b1616b43" class="">현재 <strong>Netcode for GameObjects</strong>는 Unity의 기본 멀티플레이어 솔루션으로, 주로 <strong>소규모 멀티플레이어 게임</strong>이나 <strong>간단한 네트워킹 기능을 가진 게임</strong>에 적합합니다. 하지만 대부분의 <strong>대규모 온라인 게임</strong>(MMO나 FPS와 같은 장르)에서는 요구 사항이 훨씬 복잡하기 때문에 Netcode for GameObjects를 주로 사용하지 않습니다.</p><p id="1301c77c-6f39-80ef-ad31-ce8f8fbc5a6c" class="">대형 게임 스튜디오와 복잡한 온라인 게임은 보통 <strong>커스텀 서버 엔진</strong>이나 <strong>Photon, Mirror, PlayFab, Amazon GameLift</strong> 같은 더 성능 높고 안정적인 상용 네트워크 솔루션을 사용합니다. 이들은 트래픽 관리, 성능 최적화, 확장성, 보안 등 다양한 고급 기능을 지원하므로 대규모 멀티플레이어 게임에 더 적합합니다.</p><p id="1301c77c-6f39-80df-9d89-f87e5857201b" class="">Netcode for GameObjects는 Unity가 통합된 멀티플레이어 솔루션을 제공하려는 초기 단계의 도구로, 앞으로의 발전이 기대되는 솔루션이지만 <strong>모든 온라인 게임에 보편적으로 사용되는 것은 아닙니다</strong>.</p><p id="1301c77c-6f39-80d6-b535-f5e2258749ea" class="">Unity를 사용해 **대규모 온라인 게임(MMO)**을 만들 때는 <strong>Netcode for GameObjects</strong> 대신 더 전문화된 솔루션과 서버 아키텍처를 사용하여 확장성과 성능을 확보합니다. Unity에서 대규모 온라인 게임을 개발하는 데 자주 사용되는 주요 방식은 다음과 같습니다:</p><h3 id="1301c77c-6f39-80a7-a5d7-f128a2fab242" class="">1. <strong>상용 네트워킹 솔루션</strong> 사용</h3><ul id="1301c77c-6f39-8090-91a3-ea185de28cf0" class="bulleted-list"><li style="list-style-type:disc"><strong>Photon, Mirror, MLAPI(이후 Netcode로 통합)</strong> 같은 네트워킹 플러그인들이 Unity와 잘 호환되지만, 대규모 온라인 게임에서는 주로 <strong>Photon Quantum</strong>이나 <strong>Mirror</strong>와 같은 고성능 네트워킹 솔루션이 사용됩니다.</li></ul><ul id="1301c77c-6f39-801a-9865-e14764f2ddde" class="bulleted-list"><li style="list-style-type:disc"><strong>Photon</strong>은 빠르고 신뢰성 있는 UDP 연결을 제공하며, 대규모 동시 접속에 특화된 기능을 제공합니다. Photon Quantum은 특히 실시간 멀티플레이어와 동기화에 강합니다.</li></ul><ul id="1301c77c-6f39-809a-9fc7-f06f63aa7b5a" class="bulleted-list"><li style="list-style-type:disc"><strong>Mirror</strong>는 오픈소스 네트워크 라이브러리로, 유연한 확장성이 장점입니다. 대형 프로젝트에서 커스텀 서버와 통합하거나 서버의 유연성을 높이기 위해 커스터마이징하기 좋습니다.</li></ul><h3 id="1301c77c-6f39-805c-b829-e2eb86443809" class="">2. <strong>게임 서버 호스팅 플랫폼 사용</strong></h3><ul id="1301c77c-6f39-8024-927f-e7dcf528f5c3" class="bulleted-list"><li style="list-style-type:disc">대규모 게임은 일반적으로 <strong>게임 서버 호스팅 플랫폼</strong>을 활용합니다. 대표적으로 <strong>Amazon GameLift, Microsoft PlayFab, Unity의 Multiplay</strong> 같은 플랫폼이 있습니다.</li></ul><ul id="1301c77c-6f39-80c9-a4fa-f79bb7cdfa55" class="bulleted-list"><li style="list-style-type:disc"><strong>Amazon GameLift</strong>는 AWS의 확장성과 성능을 기반으로 하여 자동 서버 스케일링, 매치메이킹, 대기 시간 감소, 비용 효율성을 지원합니다.</li></ul><ul id="1301c77c-6f39-80bc-9509-f0a1f098ee74" class="bulleted-list"><li style="list-style-type:disc"><strong>Unity Multiplay</strong>는 특히 Unity 엔진과 잘 통합되며, 대규모 사용자에게 적합한 자동 스케일링 및 서버 오케스트레이션 기능을 제공하므로 Unity 기반 MMO에 많이 활용됩니다.</li></ul><h3 id="1301c77c-6f39-80f5-a472-e44fcc66b3a0" class="">3. <strong>클라이언트-서버 아키텍처 설계</strong></h3><ul id="1301c77c-6f39-8009-904b-d18321b77d89" class="bulleted-list"><li style="list-style-type:disc">대규모 게임에서는 대부분 <strong>서버 권한 구조</strong>를 사용하여 해킹과 치트 방지를 강화합니다. 모든 중요한 게임 로직(충돌 판정, 아이템 획득 등)은 서버에서 수행되며, 클라이언트는 주로 화면 렌더링과 UI 표시를 담당합니다.</li></ul><ul id="1301c77c-6f39-807c-85b9-f272576a15a3" class="bulleted-list"><li style="list-style-type:disc">이를 위해 <strong>커스텀 서버</strong>를 구축하는 경우가 많습니다. 예를 들어, Node.js나 C++ 기반으로 서버를 제작하거나, <strong>Unity의 서버 전용 빌드</strong>를 이용하여 커스텀 서버를 개발하는 방식이 있습니다.</li></ul><h3 id="1301c77c-6f39-80e5-b5ec-c651235fa95c" class="">4. <strong>데이터베이스 및 사용자 관리 시스템 구축</strong></h3><ul id="1301c77c-6f39-802e-8782-da037f71da7e" class="bulleted-list"><li style="list-style-type:disc">MMO는 많은 사용자의 데이터를 실시간으로 저장하고 불러와야 하므로, <strong>고성능 데이터베이스</strong>와 <strong>데이터 캐싱 시스템</strong>이 필요합니다. MySQL, PostgreSQL과 같은 관계형 데이터베이스 외에도 Redis와 같은 캐싱 솔루션이 자주 사용됩니다.</li></ul><ul id="1301c77c-6f39-80d3-8af3-d1b6d14feb75" class="bulleted-list"><li style="list-style-type:disc"><strong>PlayFab</strong>이나 <strong>Firebase</strong> 같은 백엔드 플랫폼을 활용하여 사용자 관리(로그인, 친구 목록, 아이템 인벤토리 등)와 데이터를 간편하게 관리하는 방식도 있습니다.</li></ul><h3 id="1301c77c-6f39-800b-89d7-cccfe2430cff" class="">5. <strong>고급 매치메이킹과 분산 서버</strong></h3><ul id="1301c77c-6f39-80a6-9a47-deed0e89cadf" class="bulleted-list"><li style="list-style-type:disc">대규모 멀티플레이어 게임에서는 게임에 접속하는 유저를 실시간으로 연결해주는 <strong>매치메이킹 시스템</strong>이 필수입니다. Unity의 Relay와 Lobby 서비스, 혹은 Amazon GameLift의 FlexMatch를 사용해 효율적인 매치메이킹을 구성할 수 있습니다.</li></ul><ul id="1301c77c-6f39-80e1-845c-c47c59233ac4" class="bulleted-list"><li style="list-style-type:disc">또한, 수천 명의 유저가 동시에 접속할 때는 **분산 서버(샤딩)**와 <strong>인스턴스 서버</strong>를 운영하여 접속자 수를 분산시키고, 서버 부하를 최소화합니다.</li></ul><p id="1301c77c-6f39-8071-b75d-ec8ee01e7d92" class="">이런 방식으로 Unity 엔진의 장점을 살리면서도 확장성과 성능이 뛰어난 <strong>대규모 온라인 게임 아키텍처</strong>를 설계합니다.</p></div></details><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">ParrelSync</summary><div class="indented"><p id="1301c77c-6f39-80f2-8dd4-c9f984ff3333" class="">ParrelSync는 Unity에서 멀티플레이어 기능을 로컬로 테스트할 수 있도록 돕는 오픈 소스 Unity 에디터 확장 도구입니다. 이 도구는 <strong>빌드를 생성하지 않고도 멀티플레이어 환경을 테스트</strong>할 수 있게 해 주는데, 이를 위해 Unity 프로젝트 폴더를 복제하고 원본 프로젝트의 <code>Asset</code> 및 <code>ProjectSettings</code> 폴더와 <strong>심볼릭 링크</strong>를 통해 연결합니다. 이렇게 복제된 인스턴스는 에디터에서 원본과 동일하게 작동하면서도 독립적인 환경을 유지해 다수의 클론 인스턴스를 동시에 실행하고 확인할 수 있습니다.</p><p id="1301c77c-6f39-80b3-b089-c8a4e908f75e" class="">이 방식은 특히 <strong>빠른 테스트와 디버깅</strong>이 중요한 프로젝트에 유용하며, 많은 멀티플레이어 게임 개발자들이 로컬 개발 단계에서 효율성을 높이기 위해 ParrelSync를 활용하고 있습니다. 다만, Unity 공식 지원을 받지 않는 외부 도구이므로 중요한 프로젝트에서 사용할 때는 버전 관리 시스템(Git 등)을 통해 데이터를 주기적으로 백업하는 것이 좋습니다.</p><p id="1301c77c-6f39-807e-aff2-f6953a8ed006" class="">ParrelSync는 특히 <code>Netcode for GameObjects</code>와 같은 Unity 멀티플레이어 패키지와 호환성이 뛰어나며, 이를 통해 네트워크 연결과 멀티플레이어 기능을 간편하게 로컬 테스트할 수 있는 워크플로우를 제공합니다.</p></div></details><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">Network Manager - 6.png</summary><div class="indented"><figure id="1301c77c-6f39-80f4-850b-c0bf6da4f9b2" class="image"><a href="7.jpg"><img style="width:537.1875px" src="7.jpg"/></a></figure><p id="1301c77c-6f39-8039-a38e-ce17687eefbe" class="">Unity의 <strong>Network Manager</strong>는 네트워크 게임에서 클라이언트와 서버 연결을 관리하는 주요 컴포넌트입니다. 빈 오브젝트에 Network Manager를 추가하고 <code><strong>Transport</strong></code> 설정을 변경하면, 게임의 네트워크 통신 방식이 조정됩니다.</p><p id="1301c77c-6f39-8063-9c9d-f3a16d200605" class=""><strong>UnityTransport</strong>는 Unity의 공식 <code>Netcode for GameObjects</code> 패키지에서 사용하는 기본 네트워크 전송 방식입니다. 이 Transport는 UDP(사용자 데이터그램 프로토콜)를 기반으로 하며, 빠르고 안정적인 네트워크 통신을 제공합니다. UDP는 게임에서 중요한 실시간 데이터 전송을 빠르게 처리하도록 설계되었지만, 손실된 데이터 패킷을 보장하지 않으므로 빠른 업데이트가 필요한 <strong>멀티플레이어 게임에서 적합</strong>합니다.</p><p id="1301c77c-6f39-8017-8dbf-dc0bedcd2af5" class="">UnityTransport는 기존의 비공식적인 여러 Transport 옵션을 대체하며, Unity가 공식적으로 지원하는 안정적이고 확장 가능한 솔루션을 제공합니다. 따라서, 이 옵션을 선택하면 Unity의 Netcode 시스템과 완전히 호환되는 방식으로 통신을 관리할 수 있어, <strong>게임의 네트워크 성능 최적화</strong>에 유리합니다.</p></div></details><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">Network Manager - 14,15.png</summary><div class="indented"><figure id="1301c77c-6f39-8012-9873-dcfb56503d38" class="image"><a href="14.jpg"><img style="width:537.1749877929688px" src="14.jpg"/></a></figure><p id="1301c77c-6f39-8028-a757-dd559c12d7b9" class=""><code>Network Manager</code>의 <strong>Player Prefab</strong> 슬롯에 플레이어 오브젝트를 넣는 과정은, 네트워크가 시작될 때 <strong>플레이어 객체를 생성하고 관리하는 방식</strong>을 설정하는 것입니다. 이 오브젝트는 서버와 클라이언트 간에 동기화되는 플레이어의 인스턴스를 의미합니다.</p><h3 id="1301c77c-6f39-8069-820d-c4559aae3df3" class="">이 과정의 주요 역할</h3><ol type="1" id="1301c77c-6f39-80de-8807-c2c174e53c3c" class="numbered-list" start="1"><li><strong>플레이어 인스턴스 생성</strong>: 게임이 시작되면, Network Manager는 각 클라이언트에 대해 지정된 Player Prefab을 인스턴스화하여 플레이어 오브젝트를 생성합니다. 이를 통해 게임에 접속하는 모든 클라이언트에게 동일한 플레이어 객체가 나타나게 됩니다.</li></ol><ol type="1" id="1301c77c-6f39-803a-bfd0-f64b867e14d5" class="numbered-list" start="2"><li><strong>네트워크 동기화</strong>: Player Prefab으로 등록된 오브젝트는 <strong>NetworkObject</strong> 컴포넌트가 포함되어 있어야 하며, 이를 통해 서버와 클라이언트 간 데이터 동기화가 이루어집니다. 이 과정에서 Unity는 각 플레이어 오브젝트의 위치, 애니메이션 상태, 변수 등 중요한 게임 데이터의 일관성을 유지할 수 있게 됩니다.</li></ol><ol type="1" id="1301c77c-6f39-8000-9f18-dba1d40923f9" class="numbered-list" start="3"><li><strong>플레이어 관리</strong>: Network Manager는 각 클라이언트에 대해 자동으로 플레이어 인스턴스를 생성하고, 이를 통해 서버가 각 클라이언트를 관리하고 조작할 수 있게 해줍니다. 이 시스템 덕분에 개발자는 직접 코드로 클라이언트를 관리할 필요 없이 Network Manager를 통해 연결, 시작, 종료, 재접속 등을 간편하게 처리할 수 있습니다.</li></ol><p id="1301c77c-6f39-8054-8581-f47811c70788" class="">따라서 Player Prefab을 설정하는 것은 멀티플레이어 게임에서 각 플레이어가 같은 환경에서 동일한 객체를 사용할 수 있게 함으로써 <strong>일관된 게임 경험</strong>을 제공하고, 네트워크 동기화를 손쉽게 관리할 수 있도록 돕습니다.</p></div></details><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">UI Raycast Target 속성을 <strong>비활성화 - 17.png</strong></summary><div class="indented"><p id="1301c77c-6f39-80f9-89c9-f7b46079da76" class=""><strong>Raycast Target</strong>는 Unity UI 시스템에서 사용되는 속성으로, UI 요소가 레이캐스트(광선 투사)를 통해 클릭이나 터치와 같은 사용자 입력을 감지할 수 있는지를 결정합니다. 이 속성이 활성화된 UI 요소는 입력 이벤트를 수신할 수 있으며, 이를 통해 사용자와 상호작용할 수 있게 됩니다.</p><h3 id="1301c77c-6f39-8090-8f11-fe83c8db4957" class="">주요 역할</h3><ol type="1" id="1301c77c-6f39-8061-be3f-e97d029dd1cb" class="numbered-list" start="1"><li><strong>입력 수신</strong>: Raycast Target이 활성화된 요소는 사용자 입력(예: 마우스 클릭, 터치) 이벤트를 수신합니다. 이렇게 하면 버튼, 슬라이더 등과 같은 UI 요소가 사용자와 상호작용할 수 있습니다.</li></ol><ol type="1" id="1301c77c-6f39-80f7-98ff-f552074da0f3" class="numbered-list" start="2"><li><strong>레이캐스트 효율성</strong>: Raycast Target 속성이 설정된 요소는 레이캐스트가 해당 요소에 도달했을 때 이벤트를 발생시키므로, UI 요소의 상호작용을 효율적으로 관리합니다.</li></ol><ol type="1" id="1301c77c-6f39-8035-972f-d721825d359f" class="numbered-list" start="3"><li><strong>상위 요소와의 관계</strong>: 부모 요소가 Raycast Target으로 설정되어 있더라도, 자식 요소가 비활성화되면 부모의 입력 이벤트를 수신하지 못하게 됩니다. 따라서 레이캐스트의 동작을 제어할 수 있습니다.</li></ol><h3 id="1301c77c-6f39-8059-9eab-ef08ed6eb0bf" class="">사용 예시</h3><ul id="1301c77c-6f39-803c-a713-f47b85b25904" class="bulleted-list"><li style="list-style-type:disc"><strong>UI 버튼</strong>: 버튼 오브젝트의 Raycast Target을 활성화하면 사용자가 버튼을 클릭했을 때 클릭 이벤트가 발생하게 됩니다.</li></ul><ul id="1301c77c-6f39-803f-bb1d-d0773bfbfc0b" class="bulleted-list"><li style="list-style-type:disc"><strong>투명한 UI 요소</strong>: 투명한 UI 요소에서도 Raycast Target을 설정할 수 있어, 사용자 입력을 감지할 수 있습니다.</li></ul><p id="1301c77c-6f39-8050-b488-c52311e9be9d" class="">이 속성은 UI의 사용성을 높이는 데 중요한 역할을 하며, 효과적인 게임 인터페이스를 구현하는 데 필수적입니다. 더 자세한 내용은 Unity 공식 문서에서 확인할 수 있습니다: <a href="https://docs.unity3d.com/Manual/script-Graphic.html">Unity Documentation - Raycast Target</a>.</p><p id="1301c77c-6f39-803c-b9ed-d1f1e301bf78" class="">Raycast Target 속성을 <strong>비활성화</strong>하면, 해당 UI 요소는 사용자 입력(클릭, 터치 등)을 감지하지 않게 됩니다. 즉, 이 UI 요소에 대한 레이캐스트가 발생해도 이벤트를 수신하지 않으며, 사용자가 해당 요소와 상호작용할 수 없게 됩니다.</p><h3 id="1301c77c-6f39-80a0-88d5-d0ef5fb50f0c" class="">비활성화의 영향</h3><ol type="1" id="1301c77c-6f39-80a5-96f7-d21f17ccf930" class="numbered-list" start="1"><li><strong>상호작용 불가능</strong>: 버튼이나 슬라이더와 같은 UI 요소의 Raycast Target을 비활성화하면, 해당 요소에 대한 클릭이나 터치 이벤트가 무시됩니다. 사용자는 이 요소와 상호작용할 수 없게 됩니다.</li></ol><ol type="1" id="1301c77c-6f39-80fa-802a-f86ac57c9ba5" class="numbered-list" start="2"><li><strong>투명한 UI 요소</strong>: 투명한 UI 요소에서도 Raycast Target이 비활성화되면, 이 요소가 다른 요소의 클릭 이벤트를 방해하지 않습니다. 즉, 아래에 있는 UI 요소가 클릭 가능해집니다.</li></ol><ol type="1" id="1301c77c-6f39-80ab-844f-efcd2be2c93f" class="numbered-list" start="3"><li><strong>UI 흐름 제어</strong>: 여러 UI 요소가 겹치는 경우, Raycast Target 속성을 통해 사용자가 어떤 요소와 상호작용할 수 있는지를 제어할 수 있습니다. 특정 요소의 입력을 차단하고 싶을 때 유용하게 사용됩니다.</li></ol><p id="1301c77c-6f39-80ce-9c34-e2471e1f2b8d" class="">이렇게 Raycast Target을 비활성화함으로써 UI의 동작을 보다 유연하게 조정하고, 원하는 사용자 경험을 제공할 수 있습니다. Unity에 대한 더 자세한 정보는 <a href="https://docs.unity3d.com/Manual/script-Graphic.html">Unity Documentation</a>에서 확인할 수 있습니다.</p></div></details><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">Title Screen Manager - 31,32.png</summary><div class="indented"><figure id="1301c77c-6f39-80bb-ab29-dd4a8d491c81" class="image"><a href="32.jpg"><img style="width:618.1749877929688px" src="32.jpg"/></a></figure><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1301c77c-6f39-801e-b63c-d79c5542a386" class="code"><code class="language-C#">using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Unity.Netcode;
+
+namespace SG
+{
+    public class TitleScreenManager : MonoBehaviour
+    {
+        public void StartNetworkAsHost()
+        {
+            NetworkManager.Singleton.StartHost();
+        }
+    }
+}
+
+</code></pre><ul id="1301c77c-6f39-806e-acd8-df225b2b0d7c" class="toggle"><li><details open=""><summary>사전지식</summary><ul id="1301c77c-6f39-809f-90c6-d1e403546a20" class="toggle"><li><details open=""><summary>namespace 예시</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1301c77c-6f39-8044-a4e6-cb4379ae4dbd" class="code"><code class="language-C#">namespace ProjectA
+{
+    public class Player
+    {
+        public void DisplayName()
+        {
+            Debug.Log(&quot;Player from Project A&quot;);
+        }
+    }
+}
+
+namespace ProjectB
+{
+    public class Player
+    {
+        public void DisplayName()
+        {
+            Debug.Log(&quot;Player from Project B&quot;);
+        }
+    }
+}
+
+
+
+...
+...
+
+
+using ProjectA; 
+using ProjectB; 
+
+public class Main
+{
+    public void StartGame()
+    {
+        Player gameManagerA = new Player(); // ProjectA의 Player 클래스 인스턴스
+        gameManagerA.DisplayName(); // &quot;Player from Project A&quot; 출력
+
+        ProjectB.Player gameManagerB = new ProjectB.Player(); // ProjectB의 Player 클래스 인스턴스
+        gameManagerB.DisplayName(); // &quot;Player from Project B&quot; 출력
+    }
+}</code></pre></details></li></ul><ul id="1301c77c-6f39-8027-a879-fc751f5adaa8" class="toggle"><li><details open=""><summary>namespace 사용 예시</summary><p id="1301c77c-6f39-80cc-b44f-cb5760866c72" class=""><code>namespace</code>를 사용하면 클래스, 인터페이스, 구조체 등의 이름 충돌을 피할 수 있습니다. 즉, 같은 이름의 여러 요소가 있을 경우, 각 요소가 속한 네임스페이스를 통해 구분할 수 있습니다.</p><h3 id="1301c77c-6f39-8078-bbb5-f810169cc6ae" class="">주요 기능과 장점</h3><ol type="1" id="1301c77c-6f39-80e5-99a6-fc1e7686f6cd" class="numbered-list" start="1"><li><strong>이름 충돌 방지</strong>:<ul id="1301c77c-6f39-80cf-ae9b-e77611dc9e10" class="bulleted-list"><li style="list-style-type:disc">서로 다른 라이브러리나 패키지에서 같은 이름의 클래스를 사용할 수 있습니다. 이때 네임스페이스가 있으면 두 클래스를 구분할 수 있습니다.</li></ul></li></ol><ol type="1" id="1301c77c-6f39-801a-8bc0-d885441b0845" class="numbered-list" start="2"><li><strong>조직적인 코드 관리</strong>:<ul id="1301c77c-6f39-80bb-98ab-df536d6d2daf" class="bulleted-list"><li style="list-style-type:disc">관련된 클래스나 기능들을 그룹화하여 코드의 구조를 더 잘 이해할 수 있도록 돕습니다. 예를 들어, 게임 내에서 UI 관련 클래스는 <code>namespace UI</code>, 네트워크 관련 클래스는 <code>namespace Network</code>로 묶을 수 있습니다.</li></ul></li></ol><ol type="1" id="1301c77c-6f39-802c-a92c-ce3a9a806fd8" class="numbered-list" start="3"><li><strong>가독성 향상</strong>:<ul id="1301c77c-6f39-80e3-aa72-dabfd489b273" class="bulleted-list"><li style="list-style-type:disc">네임스페이스를 사용하면 코드가 더 깔끔하고 읽기 쉽게 됩니다. 사용자가 어떤 기능이 어디에 속하는지를 쉽게 파악할 수 있습니다.</li></ul></li></ol><ol type="1" id="1301c77c-6f39-80aa-b77e-dc35d3f95ed1" class="numbered-list" start="4"><li><strong>모듈화</strong>:<ul id="1301c77c-6f39-80df-8df0-dff1ec42fb7d" class="bulleted-list"><li style="list-style-type:disc">대규모 프로젝트에서 각 기능을 모듈화하여 네임스페이스로 관리하면, 코드의 재사용성이 높아지고 유지보수가 쉬워집니다.</li></ul></li></ol></details></li></ul><p id="1301c77c-6f39-80f2-a613-e2dc0a9de401" class="">
+</p></details></li></ul><ul id="1301c77c-6f39-806d-8e60-e4fb29e9a0e6" class="toggle"><li><details open=""><summary>코드해석</summary><p id="1301c77c-6f39-80be-8b9f-f8b4c77bfd2f" class=""><code>NetworkManager.Singleton.StartHost();</code>는 <strong>Netcode for GameObjects</strong>(UNet) 패키지에 포함된 기능입니다. 이 코드를 좀 더 자세히 설명하자면:</p><h3 id="1301c77c-6f39-804f-b596-ef5ec8a143a2" class="">코드 구성 요소 분석</h3><ol type="1" id="1301c77c-6f39-80dd-9945-f7b2d36ead03" class="numbered-list" start="1"><li><strong>NetworkManager</strong>:<ul id="1301c77c-6f39-80fe-bad6-c1134bdfb245" class="bulleted-list"><li style="list-style-type:disc"><code>NetworkManager</code>는 UNet 패키지에서 제공하는 클래스입니다. 이 클래스는 네트워크 연결 및 관리를 위한 여러 기능을 제공합니다. 멀티플레이어 게임의 서버와 클라이언트를 설정하고 관리하는 역할을 수행합니다.</li></ul></li></ol><ol type="1" id="1301c77c-6f39-808f-841f-c6a8161904c6" class="numbered-list" start="2"><li><strong>Singleton</strong>:<ul id="1301c77c-6f39-8047-beb1-d719e28475f1" class="bulleted-list"><li style="list-style-type:disc"><code>Singleton</code>은 <code>NetworkManager</code> 클래스의 정적 속성입니다. 이 속성은 현재 활성화된 <code>NetworkManager</code> 인스턴스를 반환합니다. Singleton 패턴을 사용하여, 애플리케이션에서 하나의 인스턴스만 존재하도록 보장합니다. 이를 통해 언제든지 동일한 인스턴스에 접근할 수 있습니다.</li></ul></li></ol><ol type="1" id="1301c77c-6f39-8078-98c9-f8ee17b4fea3" class="numbered-list" start="3"><li><strong>StartHost()</strong>:<ul id="1301c77c-6f39-8074-8240-fe555787b54f" class="bulleted-list"><li style="list-style-type:disc"><code>StartHost()</code> 메서드는 <code>NetworkManager</code>의 메서드로, 호스트 모드에서 네트워크 세션을 시작하는 기능을 제공합니다. 이 메서드를 호출하면:<ul id="1301c77c-6f39-8030-aa9b-fca839c23f6f" class="bulleted-list"><li style="list-style-type:circle">해당 인스턴스가 서버 역할을 하며, 동시에 클라이언트로서도 기능을 수행합니다.</li></ul><ul id="1301c77c-6f39-8067-bd0a-e1e107653fab" class="bulleted-list"><li style="list-style-type:circle">네트워크 연결이 설정되고, 다른 클라이언트가 이 호스트에 연결할 수 있도록 대기합니다.</li></ul></li></ul></li></ol><h3 id="1301c77c-6f39-808f-99f1-ee34eff59c60" class="">요약</h3><ul id="1301c77c-6f39-80de-8aba-c52c33858f07" class="bulleted-list"><li style="list-style-type:disc"><code>NetworkManager.Singleton.StartHost();</code>는 UNet 패키지의 기능으로, 네트워크 호스트를 시작하는 데 사용됩니다.</li></ul><ul id="1301c77c-6f39-800c-b1a4-c37bdc46f1f9" class="bulleted-list"><li style="list-style-type:disc"><code>NetworkManager</code>는 네트워크 관리를 위한 클래스로, <code>Singleton</code> 속성을 통해 단일 인스턴스에 접근하고, <code>StartHost()</code> 메서드를 호출하여 멀티플레이어 세션을 시작하는 것입니다.</li></ul><p id="1301c77c-6f39-8076-82e2-dd1f5bc9feb1" class="">이렇게 이 코드 구문은 UNet 패키지의 중요한 네트워크 기능을 활용하여 게임의 멀티플레이어 환경을 설정하는 데 필요한 작업을 수행합니다.</p></details></li></ul></div></details><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">UI button - 34.png</summary><div class="indented"><figure id="1311c77c-6f39-8028-a468-c237d2ebb439" class="image"><a href="34.jpg"><img style="width:539.1749877929688px" src="34.jpg"/></a></figure><p id="1311c77c-6f39-80f2-a9f1-dbae2dfa0c96" class="">Unity의 UI 버튼에 <strong>On Click()</strong> 이벤트를 추가하고 그 안에 함수를 연결하면, 버튼이 눌렸을 때 해당 함수가 실행됩니다. 이 과정은 다음과 같이 이루어집니다:</p><h3 id="1311c77c-6f39-8002-8c80-d28aae4039e2" class="">버튼 클릭 이벤트 설정</h3><ol type="1" id="1311c77c-6f39-8076-8a7f-d9fce9fbf4c4" class="numbered-list" start="1"><li><strong>UI 버튼 추가</strong>: 먼저 Unity 에디터에서 버튼을 생성합니다.</li></ol><ol type="1" id="1311c77c-6f39-80ca-bc73-ee6bec74d64d" class="numbered-list" start="2"><li><strong>On Click() 설정</strong>: 버튼의 <strong>Inspector</strong> 창에서 <strong>Button</strong> 컴포넌트를 찾습니다. 여기에서 <strong>On Click()</strong> 이벤트 리스트가 있습니다.</li></ol><ol type="1" id="1311c77c-6f39-8030-bfb4-dcab5b23190b" class="numbered-list" start="3"><li><strong>함수 추가</strong>:<ul id="1311c77c-6f39-803c-a94c-c8f75925a40f" class="bulleted-list"><li style="list-style-type:disc"><strong>&quot;+&quot;</strong> 버튼을 클릭하여 새로운 이벤트 항목을 추가합니다.</li></ul><ul id="1311c77c-6f39-80f9-8e49-c14876a2cb32" class="bulleted-list"><li style="list-style-type:disc">연결할 <strong>GameObject</strong>를 선택하고, 드롭다운에서 호출할 함수를 선택합니다. 함수는 public 접근 제한자가 있어야 하며, <code>void</code> 형태여야 합니다.</li></ul></li></ol><ol type="1" id="1311c77c-6f39-804a-b190-e64ec19f0f2e" class="numbered-list" start="4"><li><strong>버튼 클릭 시 실행</strong>: 설정이 완료되면, 사용자가 버튼을 클릭할 때 연결된 함수가 자동으로 호출되어 실행됩니다.</li></ol><h3 id="1311c77c-6f39-8096-9e0d-ebbe98c1500b" class="">예시</h3><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1311c77c-6f39-80ec-82ab-fd00d482f052" class="code"><code class="language-C#" style="white-space:pre-wrap;word-break:break-all">public class MyScript : MonoBehaviour
+{
+    public void OnButtonClick()
+    {
+        Debug.Log(&quot;버튼이 클릭되었습니다!&quot;);
+    }
+}
+</code></pre><p id="1311c77c-6f39-8097-ba5a-c7d0bf316955" class="">위 예시에서 <code>OnButtonClick</code> 함수가 버튼에 연결되어 있다면, 버튼이 클릭될 때마다 &quot;버튼이 클릭되었습니다!&quot;라는 메시지가 콘솔에 출력됩니다.</p><p id="1311c77c-6f39-805e-9d88-c2580a1c31b3" class="">이 방식은 게임에서 사용자 인터페이스와 상호작용하는 데 매우 유용하며, 다양한 이벤트를 통해 게임 로직을 간단하게 구현할 수 있게 해줍니다. 더 자세한 내용은 <a href="https://docs.unity3d.com/Manual/script-Button.html">Unity 공식 문서</a>에서 확인할 수 있습니다.</p></div></details><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">EventSystem - 35.png</summary><div class="indented"><figure id="1311c77c-6f39-80b6-bb94-c3e5490993fd" class="image"><a href="35.jpg"><img style="width:539.1749877929688px" src="35.jpg"/></a></figure><p id="1311c77c-6f39-80bc-82df-e1cf092b6a54" class="">Event System에 <strong>First Selected</strong> 속성에 방금 만든 버튼을 추가한 것은, UI 인터페이스에서 초기 상태에 <strong>기본으로 선택되는 요소</strong>를 설정하는 과정입니다. 이 과정은 특히 키보드나 게임패드로 UI를 탐색할 때 중요하게 작용합니다.</p><h3 id="1311c77c-6f39-80d6-9946-f3d28761fd46" class="">First Selected 설정의 주요 역할</h3><ol type="1" id="1311c77c-6f39-8036-a792-ecbbdd50c07b" class="numbered-list" start="1"><li><strong>기본 포커스 설정</strong>: 게임이 시작되거나 UI가 활성화될 때, 사용자가 특정 버튼을 기본적으로 선택할 수 있게 합니다. 이렇게 하면 플레이어는 키보드나 게임패드로 UI를 쉽게 탐색할 수 있으며, 처음부터 선택 가능한 버튼이 표시됩니다.</li></ol><ol type="1" id="1311c77c-6f39-800b-bdfe-c850817c2814" class="numbered-list" start="2"><li><strong>UI 탐색 편의성 제공</strong>: <code>First Selected</code>에 추가된 버튼은 키보드나 게임패드 입력(예: 방향키나 조이스틱)을 통해 다른 UI 요소로 이동할 수 있게 도와줍니다. 특히 콘솔이나 PC 게임에서는 기본 포커스가 설정되어 있어야 플레이어가 UI 상에서 스무스하게 탐색할 수 있습니다.</li></ol><ol type="1" id="1311c77c-6f39-80c3-b50b-e48ee7c854e8" class="numbered-list" start="3"><li><strong>UI 흐름 제어</strong>: 사용자가 게임 내 여러 메뉴를 이동하거나 창을 열 때, 개발자가 지정한 <strong>첫 번째 선택 요소</strong>로 포커스를 유지하여 UI 흐름을 더욱 직관적으로 설계할 수 있습니다.</li></ol><p id="1311c77c-6f39-80a8-9c6d-f794edb1a810" class="">이 과정은 게임의 UI 인터페이스에서 사용자가 초기 상태에 <strong>어디서부터 탐색을 시작할지</strong> 설정하는 매우 중요한 부분입니다.</p><p id="1311c77c-6f39-8046-a384-ce53be5bdd24" class="">이 과정이 생략되면 버튼이 눌러지지 않음</p></div></details><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">UI Button - 38.png</summary><div class="indented"><figure id="1311c77c-6f39-807f-ab8a-e457f9d8eaf1" class="image"><a href="38.jpg"><img style="width:539.1749877929688px" src="38.jpg"/></a></figure><figure id="1311c77c-6f39-80ed-ad7f-d4a47eca1e1b" class="image"><a href="image.png"><img style="width:495px" src="image.png"/></a></figure><p id="1311c77c-6f39-8030-9e33-f44d5a779e69" class="">눌렀을때 현재 press button 비활성화 , tilew screen canvas 활성화 , new game 버튼 select  </p></div></details><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">Network Manager - 40,41.png</summary><div class="indented"><figure id="1311c77c-6f39-80e2-8c22-d9f8bee5f8aa" class="image"><a href="40.jpg"><img style="width:539.1875px" src="40.jpg"/></a></figure><figure id="1311c77c-6f39-8050-8e34-d17a4304779a" class="image"><a href="41.jpg"><img style="width:539.1749877929688px" src="41.jpg"/></a></figure><p id="1311c77c-6f39-800e-a392-fec7c3a99f15" class="">버튼을 누르자 네트워크 host 가 실행된다.</p></div></details><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">World Save Game Manager - 43.png</summary><div class="indented"><figure id="1311c77c-6f39-8093-9aa5-f3a674095cc5" class="image"><a href="43.jpg"><img style="width:539.1875px" src="43.jpg"/></a></figure><p id="1311c77c-6f39-8023-b665-daa1f4555ab9" class="">World Save Game Manager 오브젝트 생성</p><ul id="1311c77c-6f39-8057-ad62-fbd7c29e3a74" class="toggle"><li><details open=""><summary>코드</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1311c77c-6f39-8001-88ec-d728dae3751a" class="code"><code class="language-C#">using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+
+namespace SG
+{
+
+    public class WorldSaveGameManager : MonoBehaviour
+    {
+        
+        public static WorldSaveGameManager instance;
+        [SerializeField] int worldSceneIndex = 1;
+
+        private void Awake()
+        {
+            // THERE CAN ONLY BE ONE INSTANCE OF THIS SCRIPT AT ONE TIME , IF ANOTHER EXISTS , DESTORY IT
+            if (instance == null)
+            {
+                instance = this;
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        private void Start()
+        {
+            DontDestroyOnLoad(gameObject);
+        }
+
+        public IEnumerator LoadNewGame()
+        {
+            AsyncOperation loadOperation = SceneManager.LoadSceneAsync(worldSceneIndex);
+            yield return null;
+        }
+
+
+    }
+
+}
+
+</code></pre></details></li></ul><ul id="1311c77c-6f39-80eb-a7b2-db73cea3e6e3" class="toggle"><li><details open=""><summary>코드해석</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1311c77c-6f39-80fb-888d-d7127f7a4243" class="code"><code class="language-C#">    public class WorldSaveGameManager : MonoBehaviour
+    {
+        
+        // **정적 변수(static variable)**는 클래스 단위로 메모리에 할당되므로, 프로젝트 전체에서 단 하나의 인스턴스만 존재
+        public static WorldSaveGameManager instance;
+
+        [SerializeField] int worldSceneIndex = 1;
+
+
+
+        private void Awake()
+        {
+
+            // THERE CAN ONLY BE ONE INSTANCE OF THIS SCRIPT AT ONE TIME , IF ANOTHER EXISTS , DESTORY IT
+            // 싱글톤 패턴 : 오직 하나의 인스턴스만 존재하도록 보장하는 디자인 패턴
+            if (instance == null)
+            {
+                instance = this;
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+
+        }</code></pre><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1311c77c-6f39-8085-a235-f849920c79f3" class="code"><code class="language-C#">        private void Start()
+        {
+            DontDestroyOnLoad(gameObject);
+        }</code></pre><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">코드 설명</summary><div class="indented"><p id="1311c77c-6f39-809d-bba4-d226150a3516" class=""><code>DontDestroyOnLoad(gameObject);</code>는 Unity에서 <strong>오브젝트를 씬 전환 시에도 파괴되지 않고 유지</strong>하도록 설정하는 메서드입니다. 이 메서드를 사용하면 씬이 바뀌더라도 해당 오브젝트는 메모리에서 삭제되지 않고, 계속해서 남아 있게 됩니다.</p><h3 id="1311c77c-6f39-8020-9d6a-e23ed843723a" class="">역할 및 사용 이유</h3><ol type="1" id="1311c77c-6f39-80f9-83b4-fb953814d7b6" class="numbered-list" start="1"><li><strong>씬 간 데이터 보존</strong>: 게임에서 씬이 전환될 때마다 기본적으로 해당 씬의 모든 오브젝트는 파괴되고 새로운 오브젝트들이 로드됩니다. 그러나 <code>DontDestroyOnLoad(gameObject);</code>를 호출하면 그 오브젝트는 다음 씬에서도 계속 유지됩니다. 따라서, 여러 씬에서 공통된 데이터를 유지하고자 할 때 유용합니다.</li></ol><ol type="1" id="1311c77c-6f39-800b-9d1b-f206bc09d790" class="numbered-list" start="2"><li><strong>전역 관리자 오브젝트 유지</strong>: <code>WorldSaveGameManager</code>와 같은 싱글톤 패턴을 사용해 데이터나 설정을 관리할 때, 이 스크립트가 부착된 오브젝트가 씬 전환 시 삭제되면 데이터를 잃게 됩니다. <code>DontDestroyOnLoad</code>를 사용하면 이 오브젝트가 씬 전환과 관계없이 남아 있어, 설정을 일관되게 유지할 수 있습니다.</li></ol><ol type="1" id="1311c77c-6f39-8078-be13-f5958e8e0471" class="numbered-list" start="3"><li><strong>싱글톤 패턴과 결합</strong>: <code>DontDestroyOnLoad</code>와 싱글톤 패턴을 함께 사용하면, 모든 씬에서 동일한 싱글톤 인스턴스가 유지됩니다. 새로운 씬으로 전환해도 <strong>유일한 인스턴스가 삭제되지 않도록 보장</strong>할 수 있습니다.</li></ol><h3 id="1311c77c-6f39-8071-8e1f-e79b03973f86" class="">요약 예시</h3><p id="1311c77c-6f39-8002-83f7-d44c08e13df2" class="">아래 코드의 <code>Start</code> 메서드에서 <code>DontDestroyOnLoad(gameObject);</code>를 호출함으로써 <code>WorldSaveGameManager</code>가 <strong>다른 씬에서도 동일하게 유지</strong>되도록 하는 것입니다.</p><p id="1311c77c-6f39-80fa-a140-fc93539fdcc6" class="">이 기능을 활용해 게임 전반에 걸쳐 하나의 데이터 관리자 오브젝트를 유지할 수 있습니다.<br/><br/></p></div></details><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1311c77c-6f39-8083-aba2-c9865ac04f2e" class="code"><code class="language-C#">        public IEnumerator LoadNewGame()
+        {
+            AsyncOperation loadOperation = SceneManager.LoadSceneAsync(worldSceneIndex);
+       
+            yield return null;
+        }</code></pre><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0"><code>LoadSceneAsync</code>와 <code>LoadScene</code> 차이점</summary><div class="indented"><p id="1311c77c-6f39-8079-9489-cfb84a9320a3" class=""><code>LoadSceneAsync</code>와 <code>LoadScene</code>의 차이는 씬을 로드하는 방식과 그에 따른 게임 흐름의 영향을 줍니다. 두 메서드는 다음과 같은 주요 차이점을 가지고 있습니다:</p><h3 id="1311c77c-6f39-8054-b8db-e3b49b62a745" class="">1. <strong>동기 vs 비동기</strong></h3><ul id="1311c77c-6f39-8016-867e-c453d9a4dcb0" class="bulleted-list"><li style="list-style-type:disc"><strong>LoadScene</strong>:<ul id="1311c77c-6f39-80f9-834a-e5fae044b6da" class="bulleted-list"><li style="list-style-type:circle">이 메서드는 <strong>동기적</strong>으로 씬을 로드합니다. 즉, 씬이 로드되는 동안 현재의 게임 루프가 멈추게 됩니다. 로딩이 완료될 때까지 다른 작업이 진행되지 않으며, 사용자 인터페이스가 멈추고 반응하지 않을 수 있습니다. 이로 인해 긴 로딩 시간이 발생할 경우 플레이어에게 불편함을 줄 수 있습니다.</li></ul></li></ul><ul id="1311c77c-6f39-8009-b7ad-f07992de266b" class="bulleted-list"><li style="list-style-type:disc"><strong>LoadSceneAsync</strong>:<ul id="1311c77c-6f39-8083-ae07-f1cfc276fa6c" class="bulleted-list"><li style="list-style-type:circle">반면에 이 메서드는 <strong>비동기적</strong>으로 씬을 로드합니다. 이는 로딩이 진행되는 동안 게임이 계속해서 실행되며, 사용자가 여전히 UI와 상호작용할 수 있게 됩니다. 예를 들어, 로딩 화면이나 진행률 바를 보여줄 수 있으며, 게임이 응답하지 않는 문제를 방지할 수 있습니다.</li></ul></li></ul><h3 id="1311c77c-6f39-80d6-8f37-ee0018bc95d0" class="">2. <strong>로딩 상태 확인</strong></h3><ul id="1311c77c-6f39-8017-8ee3-ccd19a71ea98" class="bulleted-list"><li style="list-style-type:disc"><strong>LoadScene</strong>:<ul id="1311c77c-6f39-8088-bb4b-f6f9a7e19f6d" class="bulleted-list"><li style="list-style-type:circle">로딩 중의 상태를 확인할 수 없습니다. 로드가 완료되기 전까지 다른 작업을 수행할 수 없으므로, UI 업데이트나 로딩 진행 표시 같은 작업이 불가능합니다.</li></ul></li></ul><ul id="1311c77c-6f39-80f0-bfda-d494c27605d2" class="bulleted-list"><li style="list-style-type:disc"><strong>LoadSceneAsync</strong>:<ul id="1311c77c-6f39-8026-bb21-dc71eab2558b" class="bulleted-list"><li style="list-style-type:circle">이 메서드는 반환된 <code>AsyncOperation</code> 객체를 통해 로딩 상태를 확인할 수 있습니다. 예를 들어, <code>loadOperation.isDone</code>을 통해 로딩 완료 여부를 확인할 수 있으며, 진행 상태를 UI에 반영할 수 있습니다.</li></ul></li></ul><h3 id="1311c77c-6f39-80b5-a3b6-d5639d9d9a02" class="">3. <strong>성능 및 사용자 경험</strong></h3><ul id="1311c77c-6f39-8048-9edb-dd24e4bfa16f" class="bulleted-list"><li style="list-style-type:disc"><strong>LoadScene</strong>:<ul id="1311c77c-6f39-8088-bfae-fc4539216d58" class="bulleted-list"><li style="list-style-type:circle">간단한 게임에서는 문제가 되지 않을 수 있지만, 대규모 게임에서는 사용자가 로딩 중에 대기하는 시간이 길어질 수 있습니다.</li></ul></li></ul><ul id="1311c77c-6f39-806d-a7ac-e4f1c1d715b9" class="bulleted-list"><li style="list-style-type:disc"><strong>LoadSceneAsync</strong>:<ul id="1311c77c-6f39-80fc-a164-ef9407a2516a" class="bulleted-list"><li style="list-style-type:circle">성능을 높이고 사용자 경험을 향상시키는 데 도움이 됩니다. 로딩 중에도 게임의 다른 요소를 업데이트하거나 사용자와 상호작용할 수 있으므로, 플레이어는 보다 매끄러운 경험을 할 수 있습니다.</li></ul></li></ul><h3 id="1311c77c-6f39-800e-b826-c67ba756a701" class="">요약</h3><ul id="1311c77c-6f39-80ea-827d-d797cfd2f4d3" class="bulleted-list"><li style="list-style-type:disc"><strong>LoadScene</strong>: 동기적 로딩, 현재 게임 멈춤, 진행 상태 확인 불가능</li></ul><ul id="1311c77c-6f39-80cf-b607-cb6fb0fd6b1c" class="bulleted-list"><li style="list-style-type:disc"><strong>LoadSceneAsync</strong>: 비동기적 로딩, 게임 계속 진행, 로딩 상태 확인 가능</li></ul><p id="1311c77c-6f39-80b0-8065-f244744935aa" class="">자세한 내용은 Unity의 공식 문서에서 확인할 수 있습니다:</p><ul id="1311c77c-6f39-80fc-a50e-f332cf190f15" class="bulleted-list"><li style="list-style-type:disc"><a href="https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.LoadScene.html">Unity Documentation - LoadScene</a></li></ul><ul id="1311c77c-6f39-807f-afe3-c9f2f7ecc01f" class="bulleted-list"><li style="list-style-type:disc"><a href="https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.LoadSceneAsync.html">Unity Documentation - LoadSceneAsync</a></li></ul></div></details><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">AsyncOperation</summary><div class="indented"><p id="1311c77c-6f39-800b-aedf-c6d89f4b5110" class=""><code>AsyncOperation</code>는 Unity에서 비동기 작업의 상태를 나타내는 클래스입니다. 주로 씬을 비동기적으로 로드하거나 리소스를 비동기적으로 로드할 때 사용됩니다. 이 클래스는 로딩 진행 상태를 모니터링하고, 로딩이 완료되었는지 확인할 수 있는 기능을 제공합니다.</p><h3 id="1311c77c-6f39-80a3-b631-c19f519382f9" class="">주요 특징</h3><ol type="1" id="1311c77c-6f39-8000-834c-e2d594e11687" class="numbered-list" start="1"><li><strong>상태 추적</strong>:<ul id="1311c77c-6f39-808e-9029-cb73d7e63386" class="bulleted-list"><li style="list-style-type:disc"><code>AsyncOperation</code> 객체를 사용하면 로딩이 얼마나 진행되었는지를 확인할 수 있습니다. <code>progress</code> 프로퍼티를 통해 현재 진행률을 얻을 수 있으며, 이 값은 0.0f에서 1.0f까지 변합니다. 1.0f는 로딩이 완료된 상태를 의미합니다.</li></ul></li></ol><ol type="1" id="1311c77c-6f39-807e-871b-cd1a56cc4796" class="numbered-list" start="2"><li><strong>완료 여부</strong>:<ul id="1311c77c-6f39-80c5-a5da-cec05a00faf0" class="bulleted-list"><li style="list-style-type:disc"><code>isDone</code> 프로퍼티를 사용하면 작업이 완료되었는지를 확인할 수 있습니다. 이 프로퍼티가 <code>true</code>일 경우, 해당 비동기 작업이 완료되었음을 나타냅니다.</li></ul></li></ol><ol type="1" id="1311c77c-6f39-8047-a8ba-c04c5a123552" class="numbered-list" start="3"><li><strong>사용 예</strong>:<ul id="1311c77c-6f39-80a1-8b86-d834ae63c769" class="bulleted-list"><li style="list-style-type:disc">씬 로딩과 관련된 비동기 작업에서 <code>AsyncOperation</code>을 사용하여 로딩 상태를 관리하고, 사용자에게 로딩 진행 상태를 표시하는 UI를 업데이트할 수 있습니다.</li></ul></li></ol><h3 id="1311c77c-6f39-80fe-8aae-ce69c8f742d2" class="">예시 코드</h3><p id="1311c77c-6f39-804c-b6b9-eb762531ce0a" class="">다음은 <code>AsyncOperation</code>을 사용하여 씬을 비동기적으로 로드하는 예시입니다:</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1311c77c-6f39-8096-b923-dd8143400a40" class="code"><code class="language-C#" style="white-space:pre-wrap;word-break:break-all">public IEnumerator LoadNewScene(int sceneIndex)
+{
+    AsyncOperation loadOperation = SceneManager.LoadSceneAsync(sceneIndex);
+
+    // 로딩 진행 상태 확인
+    while (!loadOperation.isDone)
+    {
+        float progress = loadOperation.progress; // 진행률 확인 (0.0f ~ 0.9f)
+        // UI 업데이트 또는 로딩 진행 바 표시
+        yield return null; // 다음 프레임까지 대기
+    }
+
+    // 로딩 완료 후 추가 작업
+}
+</code></pre><h3 id="1311c77c-6f39-80fe-9137-c097481383a2" class="">요약</h3><p id="1311c77c-6f39-8079-b8bb-c942a617af43" class=""><code>AsyncOperation</code>은 Unity에서 비동기 작업을 관리하고 상태를 추적하는 데 중요한 역할을 하며, 사용자에게 로딩 상태를 피드백할 수 있는 기능을 제공합니다. 더 자세한 내용은 Unity 공식 문서에서 확인할 수 있습니다: <a href="https://docs.unity3d.com/ScriptReference/AsyncOperation.html">AsyncOperation</a>.</p></div></details></details></li></ul></div></details><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">TitleScreenManager - 46.png</summary><div class="indented"><figure id="1311c77c-6f39-8038-b21c-e0fa447a6206" class="image"><a href="46.jpg"><img style="width:539.1875px" src="46.jpg"/></a></figure><p id="1311c77c-6f39-8013-ba81-fec99d4d620e" class="">싱글톤 접근</p></div></details><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">New Game Start Button - 47.png</summary><div class="indented"><figure id="1311c77c-6f39-8008-a781-dc4eed4c00bf" class="image"><a href="47.jpg"><img style="width:539.1749877929688px" src="47.jpg"/></a></figure><p id="1311c77c-6f39-80fc-ac91-dccc2d048972" class="">press start 버튼을 클릭 이후 new game 버튼을 누르면 해당 함수</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1311c77c-6f39-8021-8291-df80dd347192" class="code"><code class="language-C#">        public void StartNewGame()
+        {
+            StartCoroutine(WorldSaveGameManager.instance.LoadNewGame());
+        }</code></pre><p id="1311c77c-6f39-80e1-8d55-c657b66ed27b" class="">가 실행되도록 onclick() 에 추가</p></div></details><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">CharacterManager - 추가 설명 - 50_1 , 50_2png</summary><div class="indented"><figure id="1311c77c-6f39-804f-bf26-db6b133ba965" class="image"><a href="50_1.jpg"><img style="width:679.9874877929688px" src="50_1.jpg"/></a></figure><figure id="1311c77c-6f39-80eb-9907-dcb5b996cb0a" class="image"><a href="50_2.jpg"><img style="width:679.9874877929688px" src="50_2.jpg"/></a></figure><p id="1311c77c-6f39-80a2-9281-df2147dbc0a2" class="">prefab에 넣어놓은 플레이어는 씬 이동시에도 그대로여야 하기때문에 DontDestroyOnLoad에 넣어놓는다</p></div></details><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">PlayerUIManager - 49.png</summary><div class="indented"><figure id="1311c77c-6f39-806b-8229-e72866ce1025" class="image"><a href="49.jpg"><img style="width:680px" src="49.jpg"/></a></figure><ul id="1311c77c-6f39-8026-9ba5-cc15df6322e0" class="toggle"><li><details open=""><summary>코드</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1311c77c-6f39-8023-86b3-cb7bf66b7245" class="code"><code class="language-C#">using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Unity.Netcode;
+
+namespace SG
+{
+    public class PlayerUIManager : MonoBehaviour
+    {
+    
+		    // 싱글톤 패턴 보장
+        public static PlayerUIManager instance;
+
+        [Header(&quot;NETWORK JOIN&quot;)]
+        [SerializeField] bool startGameAsClient;
+
+        private void Awake()
+        {
+            if(instance == null)
+            {
+                instance  = this;
+            }
+            else
+            {    
+                Destroy(gameObject);
+            }
+        }
+
+				// 씬 이동시 데이터 보장
+        private void Start()
+        {
+            DontDestroyOnLoad(gameObject);
+        }
+
+
+
+        private void Update()
+        {
+            if(startGameAsClient)
+            {
+                startGameAsClient = false;
+
+                // WE MUST FIRST SHUT DOWN , BECAUSE WE HAVE STARTED AS A HOST DURING THE TITLE SCREEN
+                NetworkManager.Singleton.Shutdown();
+
+                // WE THEN RESTART , AS A CLIENT
+                NetworkManager.Singleton.StartClient();
+            }
+        }
+
+    }
+
+
+
+}</code></pre></details></li></ul><ul id="1311c77c-6f39-80fc-bd34-f6d56ca157d9" class="toggle"><li><details open=""><summary>코드해석</summary><p id="1311c77c-6f39-8061-afa1-e93864671dbc" class="">이 코드의 <code>Update()</code> 메서드는 게임의 상태에 따라 네트워크 연결을 설정하는 과정을 포함하고 있습니다. 각 부분을 해석해 보겠습니다:</p><h3 id="1311c77c-6f39-8093-84ce-ec5c6d46d5f0" class="">코드 해석</h3><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1311c77c-6f39-806e-8f86-dea61842483c" class="code"><code class="language-C#" style="white-space:pre-wrap;word-break:break-all">private void Update()
+{
+    if(startGameAsClient)
+    {
+        startGameAsClient = false;
+
+        // WE MUST FIRST SHUT DOWN , BECAUSE WE HAVE STARTED AS A HOST DURING THE TITLE SCREEN
+        NetworkManager.Singleton.Shutdown();
+
+        // WE THEN RESTART , AS A CLIENT
+        NetworkManager.Singleton.StartClient();
+    }
+}
+</code></pre><ol type="1" id="1311c77c-6f39-8024-b718-d529e69208be" class="numbered-list" start="1"><li><strong>상태 확인</strong>:<ul id="1311c77c-6f39-805d-9aa9-d0e757a19e2e" class="bulleted-list"><li style="list-style-type:disc"><code>if(startGameAsClient)</code> 조건문은 <code>startGameAsClient</code> 변수가 <code>true</code>일 때만 실행됩니다. 이 변수가 <code>true</code>라는 것은 게임이 클라이언트로 시작해야 한다는 의미입니다.</li></ul></li></ol><ol type="1" id="1311c77c-6f39-8085-82d2-db6971cb8ef9" class="numbered-list" start="2"><li><strong>변수 리셋</strong>:<ul id="1311c77c-6f39-80cd-906d-f8be8a5b3689" class="bulleted-list"><li style="list-style-type:disc"><code>startGameAsClient = false;</code> 는 이 조건이 한 번 실행된 후에는 다시 실행되지 않도록 설정합니다. <mark class="highlight-red"><strong>즉, 클라이언트로 시작하기 위해 이 코드 블록이 단 한 번만 실행되도록 합니다.</strong></mark></li></ul></li></ol><ol type="1" id="1311c77c-6f39-8010-9ecb-cf017fb45ec1" class="numbered-list" start="3"><li><strong>네트워크 종료</strong>:<ul id="1311c77c-6f39-80b5-8c2f-e0755b55d9b9" class="bulleted-list"><li style="list-style-type:disc"><code>NetworkManager.Singleton.Shutdown();</code>는 현재 네트워크 매니저를 종료하는 메서드입니다. 만약 게임이 타이틀 화면에서 호스트로 시작했다면, 클라이언트로 전환하기 전에 호스트 세션을 종료해야 합니다. 이는 호스트가 이미 활성 상태일 때 클라이언트로 전환하기 위해 필요한 단계입니다.</li></ul></li></ol><ol type="1" id="1311c77c-6f39-8007-b1d3-e4ad2f6e9053" class="numbered-list" start="4"><li><strong>클라이언트 시작</strong>:<ul id="1311c77c-6f39-80e2-97ed-ce8a7276eefc" class="bulleted-list"><li style="list-style-type:disc"><code>NetworkManager.Singleton.StartClient();</code>는 네트워크 매니저를 클라이언트 모드로 시작하는 메서드입니다. 이를 통해 게임이 클라이언트로서 네트워크에 연결되고, 서버와 통신을 시작합니다.</li></ul></li></ol><h3 id="1311c77c-6f39-8071-88ec-ea97d6572c80" class="">전체적인 흐름</h3><p id="1311c77c-6f39-803c-b557-c616b8a6c05d" class="">이 <code>Update()</code> 메서드는 매 프레임마다 실행되지만, <code>startGameAsClient</code> 변수가 <code>true</code>일 때만 클라이언트로서 게임을 시작하는 과정을 실행합니다. 초기 타이틀 화면에서 호스트로 시작한 경우, 클라이언트로 전환하기 위해 호스트 세션을 종료하고 클라이언트로 재시작하는 과정을 관리하고 있습니다.</p><h3 id="1311c77c-6f39-80f6-ba69-e849e6529dc8" class="">요약</h3><ul id="1311c77c-6f39-8068-b015-d2ac0e15025c" class="bulleted-list"><li style="list-style-type:disc">이 코드 블록은 게임이 클라이언트 모드로 시작될 때, 먼저 호스트 세션을 종료한 후 클라이언트로 시작하는 과정을 처리합니다. 이 방식은 Unity의 <code>NetworkManager</code>를 사용하여 네트워크 연결을 설정하는 기본적인 방법 중 하나입니다.</li></ul><p id="1311c77c-6f39-8092-9f05-e39bdb5b9d18" class="">더 자세한 내용은 Unity의 공식 문서나 Unity Netcode에 대한 자료를 참조하시면 좋습니다.</p><p id="1311c77c-6f39-80ab-a5b1-f419800cf391" class=""><br/>쉽게 말해 이미 게임을 시작할때 서버역할로 host를 시작했다.<br/></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1311c77c-6f39-8056-b61d-fe40a54a2ad6" class="code"><code class="language-C#">using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Unity.Netcode; // Unity Netcode for GameObjects(UNet) 패키지의 일부로, 멀티플레이어 게임을 개발할 때 네트워크 기능을 구현하는 데 필요한 클래스와 메서드를 제공
+
+
+namespace SG
+{
+    public class TitleScreenManager : MonoBehaviour
+    {
+
+        public void StartNetworkAsHost()
+        {
+            NetworkManager.Singleton.StartHost();
+        }
+
+        public void StartNewGame()
+        {
+            StartCoroutine(WorldSaveGameManager.instance.LoadNewGame());
+        }
+
+    }
+}
+</code></pre><p id="1311c77c-6f39-8060-bb16-d4407f441653" class="">startGameAsClient 가 true 로 바뀌면 이제 클라이언트가 되니 host 를 꺼주어야 한다.<br/>그리고 클라이언트를 키므로써 해당 서버에 접속한다.<br/><br/></p><p id="1311c77c-6f39-8024-84fe-fd44d1fe2fe5" class="">현재까지 설명한 코드와 구조는 기본적으로 로컬 네트워크에서만 접속 가능하다고 볼 수 있습니다. 즉, 호스트와 클라이언트가 동일한 네트워크(예: 같은 Wi-Fi)에 있을 때만 서로 연결할 수 있는 구조입니다. 이 상태에서는 퍼블릭 IP 주소나 포트 포워딩 설정이 필요하지 않기 때문에 로컬 환경에서 쉽게 테스트할 수 있습니다.</p><h3 id="1311c77c-6f39-8067-b6a0-f205010a58cd" class="">로컬 네트워크에서의 접속</h3><ul id="1311c77c-6f39-8085-a539-ed2b99402110" class="bulleted-list"><li style="list-style-type:disc"><strong>호스트</strong>: 한 기기에서 게임을 시작하고 호스트로 설정됩니다.</li></ul><ul id="1311c77c-6f39-8050-a13e-ffaa76264bbb" class="bulleted-list"><li style="list-style-type:disc"><strong>클라이언트</strong>: 다른 기기가 호스트의 IP 주소를 알고 있고, 동일한 네트워크에 있을 때 연결할 수 있습니다.</li></ul><h3 id="1311c77c-6f39-80c8-b982-c532614e3323" class="">원거리 접속을 위한 준비</h3><p id="1311c77c-6f39-8055-89bc-c1954a56248a" class="">원거리에서 플레이어가 접속할 수 있도록 하려면 다음과 같은 추가 작업이 필요합니다:</p><ol type="1" id="1311c77c-6f39-80fb-b6c6-fe5e36c50397" class="numbered-list" start="1"><li><strong>퍼블릭 IP 주소</strong>: 호스트가 실행 중인 기기의 퍼블릭 IP 주소를 알아야 합니다.</li></ol><ol type="1" id="1311c77c-6f39-80fc-a7e1-f4c9a1e76858" class="numbered-list" start="2"><li><strong>포트 포워딩</strong>: 게임에서 사용하는 포트를 라우터에서 포트 포워딩하여 외부에서 접근 가능하도록 설정해야 합니다.</li></ol><ol type="1" id="1311c77c-6f39-80ad-b44c-ca0da59253f5" class="numbered-list" start="3"><li><strong>클라이언트 연결</strong>: 클라이언트가 호스트의 퍼블릭 IP와 포트 정보를 사용하여 연결해야 합니다.</li></ol><p id="1311c77c-6f39-801f-a4f5-e6e38b93a2ca" class="">이러한 추가 단계를 통해서야만 인터넷을 통해 다른 플레이어들과 게임을 진행할 수 있습니다.</p><p id="1311c77c-6f39-8077-a2bf-eb971817ea9c" class="">더 자세한 정보는 Unity의 공식 문서에서 확인할 수 있습니다: <a href="https://docs.unity3d.com/Manual/UNetSetup.html">Unity Multiplayer Networking</a>.</p></details></li></ul></div></details></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
